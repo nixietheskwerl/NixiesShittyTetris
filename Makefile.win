@@ -1,0 +1,36 @@
+CXX = x86_64-w64-mingw32-g++
+MOC = /usr/lib/qt6/moc
+PREFIX = /usr/x86_64-w64-mingw32
+
+CXXFLAGS = -fdiagnostics-color=always -g -fPIC \
+    -I$(PREFIX)/include/qt6/QtWidgets \
+    -I$(PREFIX)/include/qt6 \
+    -DQT_WIDGETS_LIB \
+    -I$(PREFIX)/include/qt6/QtGui \
+    -DQT_GUI_LIB \
+    -I$(PREFIX)/include/qt6/QtCore \
+    -DQT_CORE_LIB
+
+LDFLAGS = -L$(PREFIX)/lib -lQt6Widgets -lQt6Gui -lQt6Core
+
+SOURCES = main.cpp engine.cpp gamewidget.cpp playfield.cpp tetromino.cpp
+MOC_HEADERS = engine.h gamewidget.h
+MOC_SOURCES = $(MOC_HEADERS:.h=.moc.cpp)
+OBJECTS = $(SOURCES:.cpp=.win.o) $(MOC_SOURCES:.cpp=.win.o)
+TARGET = tetris.exe
+
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+%.win.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+%.moc.cpp: %.h
+	$(MOC) $< -o $@
+
+clean:
+	rm -f $(OBJECTS) $(MOC_SOURCES) $(TARGET)
+
+.PHONY: all clean
